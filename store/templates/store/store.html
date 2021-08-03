@@ -1,6 +1,6 @@
 {% extends 'store/main.html' %}
 {% load static %}
-{% block content %}
+{% block F_content %}
      <div class="row">
          <h2> <strong>Die Produkte</strong></h2>
       </div>
@@ -11,14 +11,14 @@
 			<div class="box-element product">
 				<h6><strong>{{ product.name }}</strong></h6>
 				<hr>
-
-				<button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">in den Jutebeutel</button>
-				<a class="btn btn-outline-success" href="#">Info</a>
-				<h4 style="display: inline-block; float: right"><strong>€{{ product.price|floatformat:2}}</strong></h4>
+				<button data-product={{product.id}} data-action="add"  class="btn btn-outline-secondary add-btn update-cart">in den Jutebeutel</button> <!-- class="btn btn-outline-secondary add-btn update-cart"-->
+				<a data-product={{product.id}} data-action="view" class="btn btn-outline-success" href="{% url 'dynamic_detail' %}{{ product.id }}">Info</a>
+                <!--<button data-product="{{product.id}}" data-action="view" class="btn btn-outline-success" >Info</button>-->
+                <h4 style="display: inline-block; float: right"><strong>€{{ product.price|floatformat:2}}</strong></h4>
 
 			</div>
 		    </div>
           {% endfor %}
 		</div>
 
-{% endblock content %}
+{% endblock F_content %}

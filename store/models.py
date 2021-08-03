@@ -17,6 +17,7 @@ class Product(models.Model):
     digital = models.BooleanField(default=False, null=True, blank=False)
     image = models.ImageField(null=True, blank=True)
     description = models.CharField(max_length=2000, default="Beschreibung")
+    long_description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -28,6 +29,7 @@ class Product(models.Model):
         except:
             url = ''
         return url
+
 
 
 class Order(models.Model):

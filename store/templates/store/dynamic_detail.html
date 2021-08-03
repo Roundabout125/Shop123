@@ -1,0 +1,22 @@
+{% extends 'store/main.html' %}
+{% load static %}
+
+{% block F_content %}
+    <div class="box-element product">
+        <img  src="{{products.imageURL}}"/>
+        </div>
+			<div class="box-element product">
+				<h6><strong>{{ products.name }}</strong></h6>
+                <hr>
+                <button data-product={{products.id}} data-action="add"  class="btn btn-outline-secondary add-btn update-cart">in den Jutebeutel</button>
+            	<h4 style="display: inline-block; float: right"><strong>€{{ products.price|floatformat:2}}</strong></h4>
+                </div>
+                <div class="box-element product">
+
+                <h4 style="display: inline-block"><strong>{{ products.description }}</strong></h4>
+                <p> <pre>{{ products.long_description  }}</pre></p>
+                <hr>
+                <h4> Empfehlung des Hauses </h4>
+
+            </div>
+{% endblock F_content %}
