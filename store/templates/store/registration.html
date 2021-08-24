@@ -19,7 +19,7 @@
 				</div>
 				<div class="d-flex justify-content-center form_container">
 
-					<form method="POST" action="">
+					<form method="POST" action={% url 'justregister' %}>
 						{% csrf_token %}
 						<div class="input-group mb-3">
 							<div class="input-group-append">
@@ -45,7 +45,9 @@
 							</div>
 							{{form.password2}}
 						</div>
-
+                         {% for message in messages %}
+                             <h2 id="messages">{{message}}</h2>
+			 	          {% endfor %}
 
 
 				   		<div class="d-flex justify-content-center mt-3 login_container">

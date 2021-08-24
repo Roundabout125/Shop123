@@ -2,25 +2,26 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+
 class Customer(models.Model):
     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=200, null=True)
     email = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Product(models.Model):
     name = models.CharField(max_length=200, null=True)
-    price = models.FloatField()
+    price = models.FloatField(max_length=100, null=True)
     digital = models.BooleanField(default=False, null=True, blank=False)
     image = models.ImageField(null=True, blank=True)
     description = models.CharField(max_length=2000, default="Beschreibung")
     long_description = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     @property
     def imageURL(self):
@@ -32,12 +33,37 @@ class Product(models.Model):
 
 
 
+
+
+class ShippingAdress(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    #order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    address = models.CharField(max_length=200, null=False)
+    city = models.CharField(max_length=200, null=False)
+    state = models.CharField(max_length=200, null=False)
+    zipcode = models.CharField(max_length=200, null=False)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.address
+
+
+
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     date_ordered = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
     transaction_id = models.CharField(max_length=100, null=True)
-    #shipping = models.BooleanField(default=False)
+    shipping = models.BooleanField(default=False)
+    #added later
+    #address = models.CharField(max_length=100, null=True)
+    #city = models.CharField(max_length=100, null=True)
+    #state = models.CharField(max_length=100, null=True)
+    #zip_code = models.CharField(max_length=100, null=True)
+    adress = models.JSONField(null=True)
+    total = models.FloatField(max_length=100, null=True)
+    items_quantity = models.JSONField(null=True) # function is needet
+
 
     def __str__(self):
         return str(self.id)
@@ -49,7 +75,7 @@ class Order(models.Model):
         for i in orderitems:
             if i.product.digital == False:
                shipping = True
-        return shipping 
+        return shipping
 
     @property
     def get_cart_total(self):
@@ -64,6 +90,17 @@ class Order(models.Model):
         return total
 
 
+    @property
+    def get_cart_items_and_quantity(self):
+        dict = {}
+        orderitems = self.orderitem_set.all()
+        for item in orderitems:
+            dict[item] = item.quantity
+        return dict
+
+
+
+
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
@@ -74,19 +111,6 @@ class OrderItem(models.Model):
     def get_total(self):
         total = self.product.price * self.quantity
         return total
-
-
-class ShippingAdress(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
-    address = models.CharField(max_length=200, null=False)
-    city = models.CharField(max_length=200, null=False)
-    state = models.CharField(max_length=200, null=False)
-    zipcode = models.CharField(max_length=200, null=False)
-    date_added = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.address
 
 
 

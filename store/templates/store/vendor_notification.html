@@ -1,0 +1,20 @@
+Folgende Bestellung ist soeben Eingetroffen. Bestellnummer: {{ transaction_id }}.
+Bitte schnellstmöglich bearbeiten:
+
+Kunde: {{name }}
+Straße:{{adress.address }}
+Stadt:{{adress.city }}
+Land:{{adress.state }}
+PlZ:{{adress.zipcode }}
+
+positionen:
+{% for item in items %}
+Produkt:{{ item.product.name }}
+Preis:{{ item.product.price }}
+Menge:{{ item.quantity }}
+**************************
+{% endfor %}
+_____________________________________________________________________
+Anzahl Produkte Gesamt:{{order.get_cart_items }}
+Summe ${{order.get_cart_total|floatformat:2 }}
+#####################################################################

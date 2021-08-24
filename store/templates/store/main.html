@@ -9,6 +9,9 @@
 
 	        <link rel="stylesheet" type="text/css" href="{%  static 'css/main.css' %}">
 
+            <link rel="shortcut icon" href="/static/favicon/favicon.gif"/>
+            <link rel="icon" type="image/gif" href="/static/favicon/favicon.gif"/>
+
             <script type="text/javascript">var user = '{{ request.user }}'
 
             function getToken(name) {
@@ -27,6 +30,24 @@
                return cookieValue;
             }
              var csrftoken = getToken('csrftoken');
+
+            function getCookie(name) {
+                var cookieArr = document.cookie.split(";");
+                for(var i = 0; i < cookieArr.length; i++){
+                    var cookiePair = cookieArr[i].split("=");
+                    if(name==cookiePair[0].trim()) {
+                        return decodeURIComponent(cookiePair[1]);
+                    }
+                }
+                return null;
+            }
+           var cart = JSON.parse(getCookie('cart'))
+            if(cart == undefined) {
+               cart = {}
+               console.log('cart was created')
+                document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+            }
+            console.log('cart:', cart)
             </script>
      </head>
      <body>
@@ -40,13 +61,22 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="{% url 'store' %}">Store <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="{% url 'store' %}">Store <span class="sr-only">(current)</span></a>
+          <form method="GET" action="" id="searchform">
+          <input class="searchfield" id="searchbox" name="q" type="text" value="{{ request.GET.q }}" placeholder="Produktsuche"/>
+         </form>
       </li>
     </ul>
       <div class="form-inline my-2 my-lg-0">
+          {% for message in messages %}
+					<h2 id="messages">{{message}}</h2>
+				{% endfor %}
+      {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}" class="btn btn-warning">Ausloggen</a>
+      {%  else %}
           <a href="{% url 'login' %}"class="btn btn-warning"  >Einloggen</a>
-          <a href="{% url 'registration' %}"class="btn btn-warning">Registrieren</a>
-          <a href="{% url 'logout' %}" class="btn btn-warning">Ausloggen</a>
+          <a href="{% url 'register' %}"class="btn btn-warning">Registrieren</a>
+      {%  endif %}
           <a href="{% url 'cart' %}">
               <img  id="cart-icon" src="{% static 'images/cart_img.png' %}">
                </a>
