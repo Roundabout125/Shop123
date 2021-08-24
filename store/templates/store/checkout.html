@@ -16,23 +16,21 @@
 
 					<div id="shipping-info">
 						<hr>
-						<p>Shipping Information:</p>
+						<p>Versand Adresse:</p>
 						<hr>
 						<div class="form-field">
-							<input class="form-control" type="text" name="address" placeholder="Address..">
+							<input class="form-control" type="text" name="address" placeholder="Straße und Hausnummer">
 						</div>
 						<div class="form-field">
-							<input class="form-control" type="text" name="city" placeholder="City..">
+							<input class="form-control" type="text" name="city" placeholder="Stadt">
 						</div>
 						<div class="form-field">
-							<input class="form-control" type="text" name="state" placeholder="State..">
+							<input class="form-control" type="text" name="state" placeholder="Land">
 						</div>
 						<div class="form-field">
-							<input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
+							<input class="form-control" type="text" name="zipcode" placeholder="Postleitzahl">
 						</div>
-						<div class="form-field">
-							<input class="form-control" type="text" name="country" placeholder="Zip code..">
-						</div>
+
 					</div>
 
 					<hr>
@@ -43,7 +41,9 @@
 			<br>
 			<div class="box-element hidden" id="payment-info">
 				<small>Paypal Options</small>
-                <button id="make-payment">Bezahlen</button>
+                   <div id="paypal-button-container"></div>
+                <!--<button id="make-payment">Bezahlen</button>-->
+
 			</div>
 
 		</div>
@@ -54,11 +54,17 @@
 				<hr>
 				<h3>Order Summary</h3>
 				<hr>
-
+            <div class="cart-row">
+                <div style="flex:2">Bild</div>
+                <div style="flex:2">Produkt</div>
+                <div style="flex:2">Preis</div>
+                <div style="flex:2">Menge</div>
+            </div>
                 {%  for item in items %}
 				<div class="cart-row">
-					<div style="flex:2"><img class="row-image" src="{{ item.product.imageURL }}" style="width:35px;height:55px";></div>
-					<div style="flex:2"><p>{{ item.product.name }}</p></div>
+					<div style="flex:2"><img class="row-image" src="/static{{ item.product.imageURL }}" style="width:35px;height:55px";></div>
+					<a style="flex:2" href="{% url 'dynamic_detail' %}{{ item.product.id }}">{{ item.product.name }}</a>
+                    <!--<div style="flex:2"><p>{{ item.product.name }}</p></div>-->
 					<div style="flex:1"><p>{{ item.product.price }}</p></div>
 					<div style="flex:1"><p>x{{ item.quantity }}</p></div>
 				</div>
@@ -68,10 +74,58 @@
 			</div>
 		</div>
 	</div>
+    <script src="https://www.paypal.com/sdk/js?client-id=Absfso_eBbt6BGBwBIJAGBxFGQM2ZoHTzglgeIjR_odXLbx4APhr9x0ZLtl0ZiPYWJqjWNc7NOkNC8mn&currency=EUR&disable-funding=credit">
 
+    </script>
+
+
+    <script>
+    var total = '{{ order.get_cart_total }}'
+        paypal.Buttons({    // Render the PayPal button into #paypal-button-container
+            style: {
+              color:'black',
+              shape:'rect',
+            },
+            createOrder: function(data, actions) {  // Set up the transaction
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: parseFloat(total).toFixed(2)
+                        }
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {  // Finalize the transaction
+                return actions.order.capture().then(function(orderData) {
+                    // Successful capture! For demo purposes:
+                    console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                    var transaction = orderData.purchase_units[0].payments.captures[0];
+                    alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
+                    submitFormData()
+
+
+
+
+
+                    /*
+                    cart = {}
+                    document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+                    location.href= "{% url 'empty_your_cart' %}"
+                    */
+                    //location.href= "{% url 'store' %}"
+
+
+
+                    // Replace the above to show a success message within this page, e.g. // const element = document.getElementById('paypal-button-container');// element.innerHTML = '';// element.innerHTML = '<h3>Thank you for your payment!</h3>'; // Or go to another URL:  actions.redirect('thank_you.html');
+                });
+            }
+
+
+        }).render('#paypal-button-container');
+    </script>
     <script type="text/javascript">
     var shipping = '{{ order.shipping }}'
-    var total = '{{ order.get_cart_total}}'
+    //var total = '{{ order.get_cart_total}}'
 
 
     if (shipping == 'False'){
@@ -89,10 +143,8 @@
             document.getElementById('form-button').classList.add('hidden');
             document.getElementById('payment-info').classList.remove('hidden');
         })
-    document.getElementById('make-payment').addEventListener('click', function(e){
-        submitFormData()
-    })
 
+    // this function is for the paymanet
     function submitFormData(){
         console.log('Paymane Button Clicket')
         var userFormData = {
@@ -113,6 +165,8 @@
             shippingInfo.state = form.state.value
             shippingInfo.zipcode = form.zipcode.value
         }
+
+
         if(user == 'AnonymousUser'){
             userFormData.name = form.name.value
             userFormData.email = form.email.value
@@ -124,16 +178,37 @@
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken,
             },
-            body: JSON.stringify({
-                'form': userFormData
-            }),
+            body: JSON.stringify({'form': userFormData, 'address': shippingInfo})
         })
             .then((response) => response.json())
+
             .then((data) => {
                 console.log('success:', data);
-                alert('Transaction completted');
+                alert('Transaction fertig');
+                cart = {}
+                document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/;secure=true;sameSite=Strict;" //";domain=;path=/"
+                // hier funktion die auch die Objekte "cartItems" löscht nicht nur die cookies
+
+
                 window.location.href = "{% url 'store' %}"
             })
+            /*
+            .then(res=> {
+                if (res.ok) {
+                    console.log('successsss')
+                } else {
+                    console.log('notttsosuccessfull')
+                }
+
+            })*/
+
+
         }
+
+    function emptyCartAndCookie(){ // after two days of debuggin and removing a fucking comma i don't need this function anymore
+        cart = {}
+                    document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+                    location.href= "{% url 'empty_your_cart' %}"
+    }
     </script>
 {% endblock F_content %}

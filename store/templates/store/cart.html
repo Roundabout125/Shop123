@@ -32,9 +32,10 @@
 				</div>
                 {% for item in items %}
                 <div class="cart-row">
-                     <div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}" style="width:35px;height:35px;" >
+                     <div style="flex:2"><img class="row-image" src="/static{{item.product.imageURL}}" style="width:35px;height:35px;" >
                      </div>
-					 <div style="flex:2"><p>{{ item.product.name }}</p></div>
+                     <a style="flex:2" href="{% url 'dynamic_detail' %}{{ item.product.id }}">{{ item.product.name }}</a>
+					<!-- <div style="flex:2"><p>{{ item.product.name }}</p></div>-->
 					 <div style="flex:1"><p>${{ item.product.price|floatformat:2 }}</p></div>
 					 <div style="flex:1">
                         <p class="quantity">x{{ item.quantity }} </p>

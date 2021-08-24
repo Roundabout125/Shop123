@@ -25,7 +25,7 @@
 				</div>
 
 				<div class="d-flex justify-content-center form_container">
-					<form method="POST" action="">
+					<form method="POST" action={% url 'justlogin' %}>
 						{% csrf_token %}
 						<div class="input-group mb-3">
 							<div class="input-group-append">
@@ -46,17 +46,18 @@
 							<div class="d-flex justify-content-center mt-3 login_container">
 				 				<input class="btn login_btn" type="submit" value="Login">
 				   			</div>
+                        	{% for message in messages %}
+					<p id="messages">{{message}}</p>
+				{% endfor %}
+
 					</form>
 
 				</div>
 
-				{% for message in messages %}
-					<p id="messages">{{message}}</p>
-				{% endfor %}			
-		
+
 				<div class="mt-4">
 					<div class="d-flex justify-content-center links">
-						Don't have an account? <a href="{% url 'registration' %}" class="ml-2">Sign Up</a>
+						Du hast keien Account ?  <a href="{% url 'register' %}" class="ml-2">Sign Up</a>
 					</div>
                     <div class="d-flex justify-content-center mt-3 login_container">
                           <a href="{% url 'store'  %}" class="btn login_btn">Zurück zum Laden</a>
